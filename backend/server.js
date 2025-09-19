@@ -1,30 +1,31 @@
-// server.js
 import express from "express";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
-// Load environment variables from .env
 dotenv.config();
 
 const app = express();
-
-// Middleware to parse JSON
 app.use(express.json());
 
-// Example route
-app.get("/hello", (req, res) => {
-  res.send("Hello World!");
+// Example API route
+app.get("/api/hello", (req, res) => {
+  res.json({ message: "Hello World!" });
 });
 
-// Add your other routes here
-// Example: app.use("/api/users", userRoutes);
+// Serve React frontend
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Catch-all route (must be last)
-app.use((req, res) => {
-  res.status(404).send("Route not found");
+app.use(express.static(path.join(__dirname, "../frontend/build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
 });
 
-// Start the server
+// Start server
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
